@@ -20,16 +20,18 @@ namespace BU\Report {
 
 		/**
 		 * Scans wp_site table and returns sites
-	 	 *
-	 	 * @alias list-sites
-	 	 *
-	 	 * @param array $args Positional args.
-	 	 * @param array $args_assoc Assocative args.
-	 	 */
+		 *
+		 * @alias list-sites
+		 *
+		 * @param array $args Positional args.
+		 * @param array $args_assoc Assocative args.
+		 */
 		public function list_sites( $args, $args_assoc ) {
 			$sites = self::get_sites();
 
-			if ( ! $sites ) {\WP_CLI::error( 'No sites found' );}
+			if ( ! $sites ) {
+				\WP_CLI::error( 'No sites found' );
+			}
 
 			// Setup a table to return the data.
 			$output = new \cli\Table();
@@ -44,36 +46,38 @@ namespace BU\Report {
 
 		/**
 		 * Scans all sites and reports on blogs
-	 	 *
-	 	 * @alias list-blogs
-	 	 *
-	 	 * @param array $args Positional args.
-	 	 * @param array $args_assoc Assocative args.
-	 	 */
+		 *
+		 * @alias list-blogs
+		 *
+		 * @param array $args Positional args.
+		 * @param array $args_assoc Assocative args.
+		 */
 		public function list_blogs( $args, $args_assoc ) {
 			global $wpdb;
 
 			$sites = self::get_sites();
 
-			if ( ! $sites ) {\WP_CLI::error( 'No sites found' );}
+			if ( ! $sites ) {
+				\WP_CLI::error( 'No sites found' );}
 
 			// Setup a table to return the data.
 			$output = new \cli\Table();
-			$output->setHeaders( array(
-				'blog_id',
-				'site_id',
-				'domain',
-				'path',
-				'registered',
-				'last_updated',
-				'public',
-				'archived',
-				'mature',
-				'spam',
-				'deleted',
-				'lang_id',
-				'calc_post_count',
-				'admin_email',
+			$output->setHeaders(
+				array(
+					'blog_id',
+					'site_id',
+					'domain',
+					'path',
+					'registered',
+					'last_updated',
+					'public',
+					'archived',
+					'mature',
+					'spam',
+					'deleted',
+					'lang_id',
+					'calc_post_count',
+					'admin_email',
 				)
 			);
 
@@ -83,19 +87,19 @@ namespace BU\Report {
 
 				foreach ( $blogs as $blog ) {
 					// Calculate the total number of published posts and pages.
-					$post_count_query = sprintf( "SELECT COUNT(*) FROM wp_%s_posts WHERE (post_type = 'post' OR post_type = 'page') AND post_status = 'publish';", $blog['blog_id'] );
+					$post_count_query  = sprintf( "SELECT COUNT(*) FROM wp_%s_posts WHERE (post_type = 'post' OR post_type = 'page') AND post_status = 'publish';", $blog['blog_id'] );
 					$post_count_result = $wpdb->get_results( $post_count_query, ARRAY_A );
-					$post_count_arr = $post_count_result[0];
-					$post_count = $post_count_arr['COUNT(*)'];
+					$post_count_arr    = $post_count_result[0];
+					$post_count        = $post_count_arr['COUNT(*)'];
 
 					// Add the caluculated result to the reported stats.
 					$blog['post_count'] = $post_count;
 
 					// Extract the site admin email.
-					$admin_query = sprintf( "SELECT option_value FROM wp_%s_options WHERE option_name = 'admin_email';", $blog['blog_id'] );
-					$admin_result = $wpdb->get_results( $admin_query, ARRAY_A );
+					$admin_query      = sprintf( "SELECT option_value FROM wp_%s_options WHERE option_name = 'admin_email';", $blog['blog_id'] );
+					$admin_result     = $wpdb->get_results( $admin_query, ARRAY_A );
 					$admin_result_arr = $admin_result[0];
-					$admin_email = $admin_result_arr['option_value'];
+					$admin_email      = $admin_result_arr['option_value'];
 
 					// Add site admin email to reported stats.
 					$blog['admin_email'] = $admin_email;
@@ -109,23 +113,25 @@ namespace BU\Report {
 
 		/**
 		 * Scans all of the blogs in all the sites for active plugins
-	 	 *
-	 	 * @alias list-active-plugins
-	 	 *
-	 	 * @param array $args Positional args.
-	 	 * @param array $args_assoc Assocative args.
-	 	 */
+		 *
+		 * @alias list-active-plugins
+		 *
+		 * @param array $args Positional args.
+		 * @param array $args_assoc Assocative args.
+		 */
 		public function list_active_plugins( $args, $args_assoc ) {
 			$sites = self::get_sites();
-			if ( ! $sites ) {\WP_CLI::error( 'No sites found' );}
+			if ( ! $sites ) {
+				\WP_CLI::error( 'No sites found' );}
 
 			// Setup a table to return the data.
 			$output = new \cli\Table();
-			$output->setHeaders( array(
-				'site_id',
-				'blog_id',
-				'plugin_name',
-				'url',
+			$output->setHeaders(
+				array(
+					'site_id',
+					'blog_id',
+					'plugin_name',
+					'url',
 				)
 			);
 
@@ -139,7 +145,9 @@ namespace BU\Report {
 
 					$plugins = self::get_active_plugins( $blog['blog_id'] );
 
-					if ( ! $plugins ) {continue;}
+					if ( ! $plugins ) {
+						continue;
+					}
 
 					foreach ( $plugins as $plugin ) {
 						// Extract just the plugin slug from the options path.
@@ -162,38 +170,39 @@ namespace BU\Report {
 
 		/**
 		 * Scans all of the blogs in all the sites for active plugins
-	 	 *
-	 	 * @alias list-active-themes
-	 	 *
-	 	 * @param array $args Positional args.
-	 	 * @param array $args_assoc Assocative args.
-	 	 */
+		 *
+		 * @alias list-active-themes
+		 *
+		 * @param array $args Positional args.
+		 * @param array $args_assoc Assocative args.
+		 */
 		public function list_active_themes( $args, $args_assoc ) {
 			global $wpdb;
 			$blogs = self::get_blogs();
 
 			// Setup a table to return the data.
 			$output = new \cli\Table();
-			$output->setHeaders( array(
-				'site_id',
-				'blog_id',
-				'theme_name',
-				'template_name',
-				'url',
+			$output->setHeaders(
+				array(
+					'site_id',
+					'blog_id',
+					'theme_name',
+					'template_name',
+					'url',
 				)
 			);
 
 			foreach ( $blogs as $blog ) {
 				$site_url = 'http://' . $blog['domain'] . $blog['path'];
 
-				$stylesheet_query	= sprintf( "SELECT option_value FROM wp_%s_options WHERE option_name = 'stylesheet';", $blog['blog_id'] );
-				$template_query	 	= sprintf( "SELECT option_value FROM wp_%s_options WHERE option_name = 'template';", $blog['blog_id'] );
+				$stylesheet_query = sprintf( "SELECT option_value FROM wp_%s_options WHERE option_name = 'stylesheet';", $blog['blog_id'] );
+				$template_query   = sprintf( "SELECT option_value FROM wp_%s_options WHERE option_name = 'template';", $blog['blog_id'] );
 
-				$stylesheet_result		= $wpdb->get_results( $stylesheet_query, ARRAY_A );
-				$template_result		= $wpdb->get_results( $template_query, ARRAY_A );
+				$stylesheet_result = $wpdb->get_results( $stylesheet_query, ARRAY_A );
+				$template_result   = $wpdb->get_results( $template_query, ARRAY_A );
 
-				$theme_name 	= $stylesheet_result[0]['option_value'];
-				$template_name	= $template_result[0]['option_value'];
+				$theme_name    = $stylesheet_result[0]['option_value'];
+				$template_name = $template_result[0]['option_value'];
 
 				$row = array(
 					$blog['site_id'],
@@ -246,8 +255,8 @@ namespace BU\Report {
 		 */
 		public function get_active_plugins( $blog_id ) {
 			global $wpdb;
-			$query = sprintf( "SELECT option_value FROM wp_%s_options WHERE option_name = 'active_plugins';", $blog_id );
-			$result = $wpdb->get_results( $query, ARRAY_A );
+			$query   = sprintf( "SELECT option_value FROM wp_%s_options WHERE option_name = 'active_plugins';", $blog_id );
+			$result  = $wpdb->get_results( $query, ARRAY_A );
 			$plugins = unserialize( $result[0]['option_value'] );
 			return $plugins;
 		}
