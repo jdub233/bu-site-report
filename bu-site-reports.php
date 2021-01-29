@@ -1,6 +1,9 @@
 <?php
-
-
+/**
+ * WP-CLI commands to gather reports on site statistics.
+ *
+ * @package BU_Site_Reports
+ */
 
 namespace BU\Report {
 	/**
